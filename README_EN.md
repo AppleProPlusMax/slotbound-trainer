@@ -10,7 +10,7 @@ A pure external memory trainer for **Slotbound** (LÖVE 11.5 / LuaJIT 2.1 GC64 x
 
 ## Preview
 
-![SlotboundTrainer Main Window](docs/screenshot.jpg)
+![SlotboundTrainer Main Window](docs/screenshot_en.jpg)
 
 ## Key Highlights
 - **100% Pure External Memory Access**: Uses standard Windows APIs (`OpenProcess` / `VirtualQueryEx` / `ReadProcessMemory` / `WriteProcessMemory`) to locate and update LuaJIT 2.1 GC64 runtime objects (`GCtab` / `Node` / `TValue`) directly in memory.
