@@ -1,0 +1,787 @@
+<Window x:Class="SlotboundTrainer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Slotbound 内存修改器"
+        Icon="pack://application:,,,/Assets/app.ico"
+        Width="930" Height="815"
+        MinWidth="880" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgCanvas}"
+        Foreground="{StaticResource TextPrimary}"
+        FontFamily="Microsoft YaHei UI"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 1. Top Header Bar -->
+        <Border Grid.Row="0" Background="{StaticResource BgSurface}" BorderBrush="{StaticResource BorderBrushSubtle}" BorderThickness="0,0,0,1" Padding="18,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Native Slotbound Game Icon -->
+                <Border Grid.Column="0" Width="46" Height="46" CornerRadius="10" Background="#131522"
+                        BorderBrush="#353B5B" BorderThickness="1" Margin="0,0,14,0">
+                    <Image Source="pack://application:,,,/Assets/app.ico" Width="36" Height="36" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Border>
+
+                <!-- Connection Status & Live Run Info -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusDot" Width="9" Height="9" Fill="{StaticResource AccentGold}" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="TxtStatus" Text="正在搜索 Slotbound.exe 进程..." FontSize="14.5" FontWeight="Bold" Foreground="{StaticResource AccentGold}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="TxtGameInfo" Text="阶段: -   |   关卡: -   |   波次: -   |   队列单位: 0   |   战场我方/敌方: 0 / 0"
+                               FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0"/>
+                </StackPanel>
+
+                <!-- Header Action Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="BtnUnlockAll" Style="{StaticResource DangerBtn}" Content="解除全部锁定" Margin="0,0,8,0" Click="BtnUnlockAll_Click"/>
+                    <Button x:Name="BtnAttach" Style="{StaticResource PrimaryBtn}" Content="重新附加进程" Click="BtnAttach_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 2. Navigation Bar -->
+        <Border Grid.Row="1" Background="#151824" BorderBrush="{StaticResource BorderBrushSubtle}" BorderThickness="0,0,0,1" Padding="18,8">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="NavResources" Style="{StaticResource NavTabRadio}" IsChecked="True" Checked="NavTab_Checked">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="pack://application:,,,/Assets/icons/gold.png" Style="{StaticResource GameIcon}" Width="16" Height="16" Margin="0,0,7,0"/>
+                        <TextBlock Text="资源与开关" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavOdds" Style="{StaticResource NavTabRadio}" Checked="NavTab_Checked">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="pack://application:,,,/Assets/icons/odds_book.png" Style="{StaticResource GameIcon}" Width="20" Height="14" Margin="0,0,7,0"/>
+                        <TextBlock Text="概率修改" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavUnits" Style="{StaticResource NavTabRadio}" Checked="NavTab_Checked">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="pack://application:,,,/Assets/icons/battle.png" Style="{StaticResource GameIcon}" Width="16" Height="16" Margin="0,0,7,0"/>
+                        <TextBlock Text="我方单位属性" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavLogs" Style="{StaticResource NavTabRadio}" Checked="NavTab_Checked">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="pack://application:,,,/Assets/icons/core.png" Style="{StaticResource GameIcon}" Width="20" Height="14" Margin="0,0,7,0"/>
+                        <TextBlock Text="运行日志" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+        </Border>
+
+        <!-- 3. Main Content Pages -->
+        <Grid Grid.Row="2" Margin="18,14">
+
+            <!-- PAGE 1: Resources & Switches -->
+            <ScrollViewer x:Name="PageResources" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Card: Core Numeric Resources -->
+                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="核心数值修改" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGold}"/>
+                                <TextBlock Text="输入数值后点「设置」或按回车立即生效 · 图标与游戏内一一对应" FontSize="11.5"
+                                           Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Column Header Hint -->
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="项目" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="38,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="当前实时值" FontSize="11.5" Foreground="{StaticResource TextMuted}"/>
+                                <TextBlock Grid.Column="2" Text="目标数值" FontSize="11.5" Foreground="{StaticResource TextMuted}"/>
+                                <TextBlock Grid.Column="4" Text="快捷增量" FontSize="11.5" Foreground="{StaticResource TextMuted}"/>
+                                <TextBlock Grid.Column="5" Text="定时锁定" FontSize="11.5" Foreground="{StaticResource TextMuted}"/>
+                            </Grid>
+
+                            <!-- Row 1: Coins -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="6" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,10,0">
+                                        <Image Source="pack://application:,,,/Assets/icons/gold.png" Style="{StaticResource GameIcon}" Width="18" Height="18"/>
+                                    </Border>
+                                    <TextBlock Text="金币" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtCoinsCur" Grid.Column="1" Text="-" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGold}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="BoxCoins" Grid.Column="2" Style="{StaticResource DarkInput}" Text="99999" Margin="0,0,8,0" KeyDown="Input_KeyDown" Tag="coins"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryBtn}" Content="设置" Padding="8,5" Margin="0,0,8,0" Click="BtnSetCoins_Click"/>
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <Button Style="{StaticResource ModernBtn}" Content="+1000" Width="76" Padding="6,5" Margin="0,0,6,0" Click="BtnAddCoins1k_Click"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="+10000" Width="82" Padding="6,5" Click="BtnAddCoins10k_Click"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SwLockCoins" Grid.Column="5" Style="{StaticResource ToggleSwitch}" Content="锁定"/>
+                            </Grid>
+
+                            <!-- Row 2: Essence (Jungsu) -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="6" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,10,0">
+                                        <Image Source="pack://application:,,,/Assets/icons/essence.png" Style="{StaticResource GameIcon}" Width="14" Height="20"/>
+                                    </Border>
+                                    <TextBlock Text="精华" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtJungsuCur" Grid.Column="1" Text="-" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="#60A5FA" VerticalAlignment="Center"/>
+                                <TextBox x:Name="BoxJungsu" Grid.Column="2" Style="{StaticResource DarkInput}" Text="999" Margin="0,0,8,0" KeyDown="Input_KeyDown" Tag="jungsu"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryBtn}" Content="设置" Padding="8,5" Margin="0,0,8,0" Click="BtnSetJungsu_Click"/>
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <Button Style="{StaticResource ModernBtn}" Content="+50" Width="76" Padding="6,5" Margin="0,0,6,0" Click="BtnAddJungsu50_Click"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="+500" Width="82" Padding="6,5" Click="BtnAddJungsu500_Click"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SwLockJungsu" Grid.Column="5" Style="{StaticResource ToggleSwitch}" Content="锁定"/>
+                            </Grid>
+
+                            <!-- Row 3: Spins Left -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="6" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,10,0">
+                                        <Image Source="pack://application:,,,/Assets/icons/middle.png" Style="{StaticResource GameIcon}" Width="18" Height="18"/>
+                                    </Border>
+                                    <TextBlock Text="剩余旋转" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtSpinsCur" Grid.Column="1" Text="-" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="BoxSpins" Grid.Column="2" Style="{StaticResource DarkInput}" Text="99" Margin="0,0,8,0" KeyDown="Input_KeyDown" Tag="spins"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryBtn}" Content="设置" Padding="8,5" Margin="0,0,8,0" Click="BtnSetSpins_Click"/>
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <Button Style="{StaticResource ModernBtn}" Content="+10" Width="76" Padding="6,5" Margin="0,0,6,0" Click="BtnAddSpins10_Click"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="+50" Width="82" Padding="6,5" Click="BtnAddSpins50_Click"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SwLockSpins" Grid.Column="5" Style="{StaticResource ToggleSwitch}" Content="锁定"/>
+                            </Grid>
+
+                            <!-- Row 4: Free Spins -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="6" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,10,0">
+                                        <Image Source="pack://application:,,,/Assets/icons/star.png" Style="{StaticResource GameIcon}" Width="18" Height="18"/>
+                                    </Border>
+                                    <TextBlock Text="免费旋转次数" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtFreeSpinsCur" Grid.Column="1" Text="-" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="BoxFreeSpins" Grid.Column="2" Style="{StaticResource DarkInput}" Text="99" Margin="0,0,8,0" KeyDown="Input_KeyDown" Tag="freespins"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryBtn}" Content="设置" Padding="8,5" Margin="0,0,8,0" Click="BtnSetFreeSpins_Click"/>
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <Button Style="{StaticResource ModernBtn}" Content="+10" Width="76" Padding="6,5" Margin="0,0,6,0" Click="BtnAddFreeSpins10_Click"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="+50" Width="82" Padding="6,5" Click="BtnAddFreeSpins50_Click"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SwLockFreeSpins" Grid.Column="5" Style="{StaticResource ToggleSwitch}" Content="锁定"/>
+                            </Grid>
+
+                            <!-- Row 5: Core Free Rerolls -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="6" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,10,0">
+                                        <Image Source="pack://application:,,,/Assets/icons/reroll.png" Style="{StaticResource GameIcon}" Width="19" Height="19"/>
+                                    </Border>
+                                    <TextBlock Text="核心免费重掷" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtRerollsCur" Grid.Column="1" Text="-" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="BoxRerolls" Grid.Column="2" Style="{StaticResource DarkInput}" Text="99" Margin="0,0,8,0" KeyDown="Input_KeyDown" Tag="rerolls"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryBtn}" Content="设置" Padding="8,5" Margin="0,0,8,0" Click="BtnSetRerolls_Click"/>
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <Button Style="{StaticResource ModernBtn}" Content="+10" Width="76" Padding="6,5" Margin="0,0,6,0" Click="BtnAddRerolls10_Click"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="+50" Width="82" Padding="6,5" Click="BtnAddRerolls50_Click"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SwLockRerolls" Grid.Column="5" Style="{StaticResource ToggleSwitch}" Content="锁定"/>
+                            </Grid>
+
+                            <!-- Row 6: Base HP -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="6" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,10,0">
+                                        <Image Source="pack://application:,,,/Assets/icons/hp.png" Style="{StaticResource GameIcon}" Width="18" Height="16"/>
+                                    </Border>
+                                    <TextBlock Text="基地生命" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtBaseHpCur" Grid.Column="1" Text="-" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentRed}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="BoxBaseHp" Grid.Column="2" Style="{StaticResource DarkInput}" Text="99" Margin="0,0,8,0" KeyDown="Input_KeyDown" Tag="basehp"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryBtn}" Content="设置" Padding="8,5" Margin="0,0,8,0" Click="BtnSetBaseHp_Click"/>
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <Button Style="{StaticResource ModernBtn}" Content="+10" Width="76" Padding="6,5" Margin="0,0,6,0" Click="BtnAddBaseHp10_Click"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="设为999" Width="82" Padding="6,5" Click="BtnSetBaseHp999_Click"/>
+                                </StackPanel>
+                                <CheckBox x:Name="SwLockBaseHp" Grid.Column="5" Style="{StaticResource ToggleSwitch}" Content="锁定"/>
+                            </Grid>
+
+                            <!-- Row 7: Originite -->
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="175"/>
+                                    <ColumnDefinition Width="115"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="185"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="28" Height="28" CornerRadius="6" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,10,0">
+                                        <Image Source="pack://application:,,,/Assets/icons/originite_ui.png" Style="{StaticResource GameIcon}" Width="19" Height="19"/>
+                                    </Border>
+                                    <TextBlock Text="本局源石" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtOriginiteCur" Grid.Column="1" Text="-" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentPurple}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="BoxOriginite" Grid.Column="2" Style="{StaticResource DarkInput}" Text="9999" Margin="0,0,8,0" KeyDown="Input_KeyDown" Tag="originite"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryBtn}" Content="设置" Padding="8,5" Margin="0,0,8,0" Click="BtnSetOriginite_Click"/>
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <Button Style="{StaticResource ModernBtn}" Content="+1000" Width="76" Padding="6,5" Margin="0,0,6,0" Click="BtnAddOriginite1k_Click"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="+10000" Width="82" Padding="6,5" Click="BtnAddOriginite10k_Click"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="5" Text="结算计入局外" FontSize="11.5" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card: Slot, Shop & Battle Toggles -->
+                    <Border Style="{StaticResource CardBorder}">
+                        <StackPanel>
+                            <TextBlock Text="老虎机、商店与战场功能" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGold}" Margin="0,0,0,8"/>
+
+                            <UniformGrid Columns="2" Margin="0">
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="11,8" Margin="0,0,8,7">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="pack://application:,,,/Assets/icons/gold.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="免费无限付费旋转" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock Text="费用归零且解除每波次数限制" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="SwZeroSpinCost" Grid.Column="2" Style="{StaticResource ToggleSwitch}" Checked="SwZeroSpinCost_Changed" Unchecked="SwZeroSpinCost_Changed"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="11,8" Margin="4,0,0,7">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="pack://application:,,,/Assets/icons/reroll.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="商店免费重掷" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock Text="商店刷新商品费用归零" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="SwFreeShopReroll" Grid.Column="2" Style="{StaticResource ToggleSwitch}" Checked="SwFreeShopReroll_Changed" Unchecked="SwFreeShopReroll_Changed"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="11,8" Margin="0,0,8,7">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="pack://application:,,,/Assets/icons/joker_big.png" Style="{StaticResource GameIcon}" Width="22" Height="20" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="老虎机每次必中" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock Text="锁定原生 forceWinOnce 必中" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="SwForceWin" Grid.Column="2" Style="{StaticResource ToggleSwitch}" Checked="SwForceWin_Changed" Unchecked="SwForceWin_Changed"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="11,8" Margin="4,0,0,7">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="pack://application:,,,/Assets/icons/hp.png" Style="{StaticResource GameIcon}" Width="20" Height="18" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="我方全员无敌" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock Text="战斗中实时将存活单位锁满血" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="SwGodAllies" Grid.Column="2" Style="{StaticResource ToggleSwitch}"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="11,8" Margin="0,0,8,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="pack://application:,,,/Assets/icons/boss.png" Style="{StaticResource GameIcon}" Width="20" Height="16" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="敌人自动残血 (1 HP)" FontSize="13" FontWeight="SemiBold"/>
+                                            <TextBlock Text="一碰即死，正常触发击杀奖励" FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="SwOneHitEnemies" Grid.Column="2" Style="{StaticResource ToggleSwitch}"/>
+                                    </Grid>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="11,8" Margin="4,0,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" Style="{StaticResource SuccessBtn}" Padding="8,6" Click="BtnHealAllies_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="pack://application:,,,/Assets/icons/hp.png" Style="{StaticResource GameIcon}" Width="14" Height="12" Margin="0,0,6,0"/>
+                                                <TextBlock Text="立即治愈全员"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Grid.Column="2" Style="{StaticResource DangerBtn}" Padding="8,6" Click="BtnWeakenEnemies_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="pack://application:,,,/Assets/icons/boss.png" Style="{StaticResource GameIcon}" Width="16" Height="13" Margin="0,0,6,0"/>
+                                                <TextBlock Text="场上敌人残血"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- PAGE 2: Probability Editor -->
+            <ScrollViewer x:Name="PageOdds" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                <StackPanel>
+                    <!-- Card 1: Rarity Probabilities -->
+                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Image Source="pack://application:,,,/Assets/icons/odds_book.png" Style="{StaticResource GameIcon}" Width="24" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="稀有度概率修改" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGold}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock x:Name="TxtRaritySum" Text="当前输入总和: 100.0%" FontSize="12" Foreground="{StaticResource AccentGreen}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                    <Button Style="{StaticResource ModernBtn}" Content="刷新读取" Padding="10,4" Click="BtnRefreshOdds_Click"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <UniformGrid Columns="5" Margin="0,0,0,12">
+                                <!-- Normal -->
+                                <Border Background="#151825" BorderBrush="#383E5C" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,6,0">
+                                    <StackPanel>
+                                        <TextBlock Text="普通" FontSize="13.5" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                        <TextBlock x:Name="TxtProbNormalCur" Text="当前: -" FontSize="11.5" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,8"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxProbNormal" Style="{StaticResource DarkInput}" Text="80.3" TextChanged="RarityBox_TextChanged" KeyDown="RarityBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Advanced -->
+                                <Border Background="#151825" BorderBrush="#2D523D" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="3,0">
+                                    <StackPanel>
+                                        <TextBlock Text="高级" FontSize="13.5" FontWeight="Bold" Foreground="#99D9A6"/>
+                                        <TextBlock x:Name="TxtProbAdvancedCur" Text="当前: -" FontSize="11.5" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,8"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxProbAdvanced" Style="{StaticResource DarkInput}" Text="15" TextChanged="RarityBox_TextChanged" KeyDown="RarityBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Rare -->
+                                <Border Background="#151825" BorderBrush="#2E4775" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="3,0">
+                                    <StackPanel>
+                                        <TextBlock Text="稀有" FontSize="13.5" FontWeight="Bold" Foreground="#99BFFF"/>
+                                        <TextBlock x:Name="TxtProbRareCur" Text="当前: -" FontSize="11.5" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,8"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxProbRare" Style="{StaticResource DarkInput}" Text="4.5" TextChanged="RarityBox_TextChanged" KeyDown="RarityBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Legendary -->
+                                <Border Background="#151825" BorderBrush="#6B441C" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="3,0">
+                                    <StackPanel>
+                                        <TextBlock Text="传说" FontSize="13.5" FontWeight="Bold" Foreground="#F59E3A"/>
+                                        <TextBlock x:Name="TxtProbLegendaryCur" Text="当前: -" FontSize="11.5" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,8"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxProbLegendary" Style="{StaticResource DarkInput}" Text="0.2" TextChanged="RarityBox_TextChanged" KeyDown="RarityBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Prism -->
+                                <Border Background="#151825" BorderBrush="#6B2FA0" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="6,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="棱彩" FontSize="13.5" FontWeight="Bold" Foreground="#D966FF"/>
+                                        <TextBlock x:Name="TxtProbPrismCur" Text="当前: -" FontSize="11.5" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,8"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxProbPrism" Style="{StaticResource DarkInput}" Text="0" TextChanged="RarityBox_TextChanged" KeyDown="RarityBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <WrapPanel VerticalAlignment="Center">
+                                <Button Style="{StaticResource PrimaryBtn}" Content="应用稀有度概率" Margin="0,0,8,0" Click="BtnApplyRarity_Click"/>
+                                <Button Style="{StaticResource GoldBtn}" Content="100% 传说" Margin="0,0,8,0" Click="BtnPresetLegendary_Click"/>
+                                <Button Style="{StaticResource ModernBtn}" BorderBrush="#A855F7" Foreground="#E9D5FF" Background="#3B1D5A" Content="100% 棱彩" Margin="0,0,8,0" Click="BtnPresetPrism_Click"/>
+                                <Button Style="{StaticResource ModernBtn}" Content="传说50% + 棱彩50%" Margin="0,0,8,0" Click="BtnPresetHalfLegPrism_Click"/>
+                                <Button Style="{StaticResource ModernBtn}" Content="恢复默认" Click="BtnRestoreRarity_Click"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card 2: Slot Force Win Probability -->
+                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Width="34" Height="34" CornerRadius="7" Background="#121420" BorderBrush="#2D334D" BorderThickness="1" Margin="0,0,12,0">
+                                <Image Source="pack://application:,,,/Assets/icons/joker_big.png" Style="{StaticResource GameIcon}" Width="24" Height="22"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="老虎机强制中奖概率 (forceWinProb)" FontSize="13.5" FontWeight="Bold" Foreground="{StaticResource AccentGold}"/>
+                                    <TextBlock x:Name="TxtForceWinCur" Text="当前: -" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource AccentGreen}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="直接修改底层中奖概率（设为 100% 每次旋转必中，且清除压制概率）" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBox x:Name="BoxForceWinProb" Style="{StaticResource DarkInput}" Width="74" Text="100" KeyDown="ForceWinBox_KeyDown"/>
+                                <TextBlock Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="5,0,10,0"/>
+                                <Button Style="{StaticResource PrimaryBtn}" Content="应用" Margin="0,0,6,0" Click="BtnApplyForceWin_Click"/>
+                                <Button Style="{StaticResource SuccessBtn}" Content="100% 必中" Margin="0,0,6,0" Click="BtnForceWin100_Click"/>
+                                <Button Style="{StaticResource ModernBtn}" Content="归零" Click="BtnForceWin0_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Card 3: Class Symbol Weights -->
+                    <Border Style="{StaticResource CardBorder}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="符号出现权重（控制老虎机各职业符号出率）" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGold}"/>
+                                <TextBlock Text="调高目标符号权重即可定向抽对应职业" FontSize="11.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <UniformGrid Columns="6" Margin="0,0,0,12">
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,6,0">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Image Source="pack://application:,,,/Assets/icons/sym_W.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,6,0"/>
+                                            <TextBlock Text="W 剑" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtSymWCur" Text="当前: -" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxSymW" Style="{StaticResource DarkInput}" Text="20" KeyDown="SymbolBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="3,0">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Image Source="pack://application:,,,/Assets/icons/sym_A.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,6,0"/>
+                                            <TextBlock Text="A 弓" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtSymACur" Text="当前: -" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxSymA" Style="{StaticResource DarkInput}" Text="20" KeyDown="SymbolBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="3,0">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Image Source="pack://application:,,,/Assets/icons/sym_S.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,6,0"/>
+                                            <TextBlock Text="S 枪" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtSymSCur" Text="当前: -" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxSymS" Style="{StaticResource DarkInput}" Text="20" KeyDown="SymbolBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="3,0">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Image Source="pack://application:,,,/Assets/icons/sym_H.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,6,0"/>
+                                            <TextBlock Text="H 骑" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtSymHCur" Text="当前: -" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxSymH" Style="{StaticResource DarkInput}" Text="15" KeyDown="SymbolBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="3,0">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Image Source="pack://application:,,,/Assets/icons/sym_M.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,6,0"/>
+                                            <TextBlock Text="M 法" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtSymMCur" Text="当前: -" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxSymM" Style="{StaticResource DarkInput}" Text="15" KeyDown="SymbolBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#151825" BorderBrush="#262B42" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="6,0,0,0">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Image Source="pack://application:,,,/Assets/icons/sym_D.png" Style="{StaticResource GameIcon}" Width="20" Height="20" Margin="0,0,6,0"/>
+                                            <TextBlock Text="D 皇冠" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtSymDCur" Text="当前: -" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <TextBox x:Name="BoxSymD" Style="{StaticResource DarkInput}" Text="10" KeyDown="SymbolBox_KeyDown"/>
+                                            <TextBlock Grid.Column="1" Text="%" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource PrimaryBtn}" Content="应用符号权重" Margin="0,0,8,0" Click="BtnApplySymbols_Click"/>
+                                <Button Style="{StaticResource ModernBtn}" Content="六系均分 (16.7%)" Margin="0,0,8,0" Click="BtnEqualSymbols_Click"/>
+                                <Button Style="{StaticResource ModernBtn}" Content="恢复默认权重" Click="BtnRestoreSymbols_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- PAGE 3: Roster Units -->
+            <Grid x:Name="PageUnits" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Bulk Boost Toolbar -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                    <Button Style="{StaticResource PrimaryBtn}" Margin="0,0,8,0" Click="BtnRefreshUnits_Click" Content="刷新单位列表"/>
+                    <Button Style="{StaticResource DangerBtn}" Margin="0,0,8,0" Click="BtnBoostAtk_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://application:,,,/Assets/icons/atk.png" Style="{StaticResource GameIcon}" Width="14" Height="14" Margin="0,0,6,0"/>
+                            <TextBlock Text="全员攻击 ×2"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SuccessBtn}" Margin="0,0,8,0" Click="BtnBoostHp_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://application:,,,/Assets/icons/hp.png" Style="{StaticResource GameIcon}" Width="14" Height="12" Margin="0,0,6,0"/>
+                            <TextBlock Text="全员生命 ×2"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource GoldBtn}" Click="BtnBoostAspd_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://application:,,,/Assets/icons/aspd.png" Style="{StaticResource GameIcon}" Width="14" Height="14" Margin="0,0,6,0"/>
+                            <TextBlock Text="全员攻速 ×1.5"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Units Table -->
+                <DataGrid x:Name="GridUnits" Grid.Row="1" Style="{StaticResource DarkDataGrid}" AutoGenerateColumns="False"
+                          SelectionChanged="GridUnits_SelectionChanged" Margin="0,0,0,12">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="46"/>
+                        <DataGridTextColumn Header="符号" Binding="{Binding Symbol}" Width="58"/>
+                        <DataGridTextColumn Header="单位" Binding="{Binding DisplayName}" Width="1.4*"/>
+                        <DataGridTextColumn Header="品质" Binding="{Binding GradeLabel}" Width="74"/>
+                        <DataGridTextColumn Header="星级" Binding="{Binding Rank, StringFormat=0}" Width="62"/>
+                        <DataGridTextColumn Header="吸收 LV" Binding="{Binding AbsorbLv, StringFormat=0}" Width="76"/>
+                        <DataGridTextColumn Header="攻击力" Binding="{Binding Atk, StringFormat=0.##}" Width="*"/>
+                        <DataGridTextColumn Header="生命值" Binding="{Binding Hp, StringFormat=0.##}" Width="*"/>
+                        <DataGridTextColumn Header="攻速" Binding="{Binding Aspd, StringFormat=0.###}" Width="82"/>
+                        <DataGridTextColumn Header="刻印槽" Binding="{Binding MaxImprintSlots, StringFormat=0}" Width="72"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Selected Unit Editor Card -->
+                <Border Grid.Row="2" Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="精准编辑选中单位（同步战场实体，写入前实时校验身份）" FontSize="13" FontWeight="Bold" Foreground="{StaticResource AccentGold}" Margin="0,0,0,10"/>
+                        <WrapPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                                <Image Source="pack://application:,,,/Assets/icons/atk.png" Style="{StaticResource GameIcon}" Width="15" Height="15" Margin="0,0,6,0"/>
+                                <TextBlock Text="攻击" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBox x:Name="BoxUnitAtk" Style="{StaticResource DarkInput}" Width="86" KeyDown="UnitBox_KeyDown"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                                <Image Source="pack://application:,,,/Assets/icons/hp.png" Style="{StaticResource GameIcon}" Width="15" Height="13" Margin="0,0,6,0"/>
+                                <TextBlock Text="生命" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBox x:Name="BoxUnitHp" Style="{StaticResource DarkInput}" Width="86" KeyDown="UnitBox_KeyDown"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                                <Image Source="pack://application:,,,/Assets/icons/aspd.png" Style="{StaticResource GameIcon}" Width="14" Height="14" Margin="0,0,6,0"/>
+                                <TextBlock Text="攻速" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBox x:Name="BoxUnitAspd" Style="{StaticResource DarkInput}" Width="72" KeyDown="UnitBox_KeyDown"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                                <Image Source="pack://application:,,,/Assets/icons/upgrade.png" Style="{StaticResource GameIcon}" Width="13" Height="16" Margin="0,0,6,0"/>
+                                <TextBlock Text="吸收LV" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBox x:Name="BoxUnitAbsorb" Style="{StaticResource DarkInput}" Width="66" KeyDown="UnitBox_KeyDown"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center">
+                                <Image Source="pack://application:,,,/Assets/icons/star.png" Style="{StaticResource GameIcon}" Width="15" Height="15" Margin="0,0,6,0"/>
+                                <TextBlock Text="刻印槽" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBox x:Name="BoxUnitSlots" Style="{StaticResource DarkInput}" Width="58" KeyDown="UnitBox_KeyDown"/>
+                            </StackPanel>
+
+                            <Button Style="{StaticResource SuccessBtn}" Content="应用修改" Padding="16,6" Click="BtnApplyUnit_Click"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- PAGE 3: Operation Log -->
+            <Border x:Name="PageLogs" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <TextBlock Text="内存读写与安全防护日志" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGold}" VerticalAlignment="Center"/>
+                        <Button Style="{StaticResource ModernBtn}" Content="清空日志" Padding="10,4" HorizontalAlignment="Right" Click="BtnClearLog_Click"/>
+                    </Grid>
+                    <TextBox x:Name="TxtLog" Grid.Row="1" IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                             Background="{StaticResource BgInput}" Foreground="{StaticResource TextSecondary}"
+                             BorderBrush="{StaticResource BorderBrushSubtle}" BorderThickness="1"
+                             FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI" FontSize="12" Padding="10"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- 4. Bottom Live Feedback Bar -->
+        <Border Grid.Row="3" Background="{StaticResource BgSurface}" BorderBrush="{StaticResource BorderBrushSubtle}" BorderThickness="0,1,0,0" Padding="18,7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Ellipse x:Name="ToastDot" Grid.Column="0" Width="7" Height="7" Fill="{StaticResource AccentGreen}" Margin="0,0,8,0"/>
+                <TextBlock x:Name="TxtToast" Grid.Column="1" Text="纯外部内存安全模式已就绪（不修改任何游戏文件，不注入 DLL）"
+                           FontSize="12" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="LuaJIT 2.1 GC64 · Safe RW Guard" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
