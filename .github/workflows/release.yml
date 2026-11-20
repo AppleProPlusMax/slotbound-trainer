@@ -41,19 +41,21 @@ jobs:
           name: "SlotboundTrainer ${{ github.ref_name }}"
           generate_release_notes: true
           body: |
-            ## Slotbound 纯内存修改器 ${{ github.ref_name }}
+            ## SlotboundTrainer ${{ github.ref_name }} (中文 / English)
 
-            面向 **Slotbound**（LÖVE 11.5 / LuaJIT 2.1 GC64 x64）的纯外部内存修改器，绝不修改任何游戏文件，不注入 DLL。
+            Pure external memory trainer for **Slotbound** (LÖVE 11.5 / LuaJIT 2.1 GC64 x64) — zero file edits, zero DLL injection.
+            面向 **Slotbound** 的纯外部内存修改器，绝不修改任何游戏文件，不注入 DLL，支持一键实时中英文切换。
 
-            ### 下载说明
-            - **`SlotboundTrainer-${{ github.ref_name }}-win-x64-standalone.zip`**（推荐）：独立自包含单文件版，解压即用，无需安装 .NET 运行时。
-            - **`SlotboundTrainer-${{ github.ref_name }}-win-x64-net6.zip`**：轻量版（需本机已安装 .NET 6 Desktop Runtime）。
+            ### Downloads / 下载说明
+            - **`SlotboundTrainer-${{ github.ref_name }}-win-x64-standalone.zip`** *(Recommended / 推荐)*: Self-contained single-file executable, no .NET runtime required. 独立自包含单文件版，解压即用。
+            - **`SlotboundTrainer-${{ github.ref_name }}-win-x64-net6.zip`**: Lightweight build (requires .NET 6 Desktop Runtime). 轻量单文件版。
 
-            ### 主要功能
-            - 资源修改与定时锁定：金币、精华、剩余旋转、免费旋转次数、核心免费重掷、基地生命、本局源石
-            - 实用开关：免费无限付费旋转、商店免费重掷、老虎机每次必中、战斗我方无敌、敌人自动残血 (1 HP)
-            - 概率修改：普通/高级/稀有/传说/棱彩出率、老虎机强制中奖概率、六大职业符号权重
-            - 单位属性：全员倍率强化 + 选中单位精准修改
+            ### Highlights / 主要功能
+            - Live Chinese / English UI switcher (`EN` / `中文`) · 一键实时中英文切换
+            - Resources & Freezes: Gold, Essence, Spins Left, Free Spins, Core Rerolls, Base HP, Run Originite
+            - Cheats: Free Unlimited Paid Spins, Free Shop Reroll, Guaranteed Slot Win, Ally God Mode, One-Hit Enemies (1 HP)
+            - Drop Rates: Rarity Probabilities (Normal / Advanced / Rare / Legendary / Prism), Forced Slot Win Rate, 6 Class Symbol Weights
+            - Roster Units: Bulk ATK/HP/ASPD boosts + live-synced single-unit editor
           files: |
             SlotboundTrainer-${{ github.ref_name }}-win-x64-standalone.zip
             SlotboundTrainer-${{ github.ref_name }}-win-x64-net6.zip

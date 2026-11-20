@@ -1,0 +1,162 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="AppTitle">Slotbound 内存修改器</sys:String>
+    <sys:String x:Key="BtnLangSwitch">EN</sys:String>
+    <sys:String x:Key="BtnUnlockAll">解除全部锁定</sys:String>
+    <sys:String x:Key="BtnAttach">重新附加进程</sys:String>
+
+    <!-- Navigation -->
+    <sys:String x:Key="NavResources">资源与开关</sys:String>
+    <sys:String x:Key="NavOdds">概率修改</sys:String>
+    <sys:String x:Key="NavUnits">我方单位属性</sys:String>
+    <sys:String x:Key="NavLogs">运行日志</sys:String>
+
+    <!-- Page 1: Resources -->
+    <sys:String x:Key="CardResourcesTitle">核心数值修改</sys:String>
+    <sys:String x:Key="CardResourcesHint">输入数值后点「设置」或按回车立即生效 · 图标与游戏内一一对应</sys:String>
+    <sys:String x:Key="ColItem">项目</sys:String>
+    <sys:String x:Key="ColCurrent">当前实时值</sys:String>
+    <sys:String x:Key="ColTarget">目标数值</sys:String>
+    <sys:String x:Key="ColQuick">快捷增量</sys:String>
+    <sys:String x:Key="ColLock">定时锁定</sys:String>
+
+    <sys:String x:Key="ResCoins">金币</sys:String>
+    <sys:String x:Key="ResEssence">精华</sys:String>
+    <sys:String x:Key="ResSpins">剩余旋转</sys:String>
+    <sys:String x:Key="ResFreeSpins">免费旋转次数</sys:String>
+    <sys:String x:Key="ResCoreRerolls">核心免费重掷</sys:String>
+    <sys:String x:Key="ResBaseHp">基地生命</sys:String>
+    <sys:String x:Key="ResOriginite">本局源石</sys:String>
+
+    <sys:String x:Key="BtnSet">设置</sys:String>
+    <sys:String x:Key="BtnSet999">设为999</sys:String>
+    <sys:String x:Key="LblLock">锁定</sys:String>
+    <sys:String x:Key="HintOriginite">结算计入局外</sys:String>
+
+    <!-- Page 1: Toggles -->
+    <sys:String x:Key="CardTogglesTitle">老虎机、商店与战场功能</sys:String>
+    <sys:String x:Key="SwZeroSpinTitle">免费无限付费旋转</sys:String>
+    <sys:String x:Key="SwZeroSpinDesc">费用归零且解除每波次数限制</sys:String>
+    <sys:String x:Key="SwFreeShopTitle">商店免费重掷</sys:String>
+    <sys:String x:Key="SwFreeShopDesc">商店刷新商品费用归零</sys:String>
+    <sys:String x:Key="SwForceWinTitle">老虎机每次必中</sys:String>
+    <sys:String x:Key="SwForceWinDesc">锁定原生 forceWinOnce 必中</sys:String>
+    <sys:String x:Key="SwGodAlliesTitle">我方全员无敌</sys:String>
+    <sys:String x:Key="SwGodAlliesDesc">战斗中实时将存活单位锁满血</sys:String>
+    <sys:String x:Key="SwOneHitTitle">敌人自动残血 (1 HP)</sys:String>
+    <sys:String x:Key="SwOneHitDesc">一碰即死，正常触发击杀奖励</sys:String>
+    <sys:String x:Key="BtnHealAllies">立即治愈全员</sys:String>
+    <sys:String x:Key="BtnWeakenEnemies">场上敌人残血</sys:String>
+
+    <!-- Page 2: Probabilities -->
+    <sys:String x:Key="CardRarityTitle">稀有度概率修改</sys:String>
+    <sys:String x:Key="BtnRefreshRead">刷新读取</sys:String>
+    <sys:String x:Key="GradeNormal">普通</sys:String>
+    <sys:String x:Key="GradeAdvanced">高级</sys:String>
+    <sys:String x:Key="GradeRare">稀有</sys:String>
+    <sys:String x:Key="GradeLegendary">传说</sys:String>
+    <sys:String x:Key="GradePrism">棱彩</sys:String>
+    <sys:String x:Key="BtnApplyRarity">应用稀有度概率</sys:String>
+    <sys:String x:Key="BtnPresetLeg">100% 传说</sys:String>
+    <sys:String x:Key="BtnPresetPrism">100% 棱彩</sys:String>
+    <sys:String x:Key="BtnPresetHalf">传说50% + 棱彩50%</sys:String>
+    <sys:String x:Key="BtnRestoreDefault">恢复默认</sys:String>
+
+    <sys:String x:Key="CardForceWinTitle">老虎机强制中奖概率 (forceWinProb)</sys:String>
+    <sys:String x:Key="CardForceWinDesc">直接修改底层中奖概率（设为 100% 每次旋转必中，且清除压制概率）</sys:String>
+    <sys:String x:Key="BtnApply">应用</sys:String>
+    <sys:String x:Key="BtnForce100">100% 必中</sys:String>
+    <sys:String x:Key="BtnZero">归零</sys:String>
+
+    <sys:String x:Key="CardSymbolsTitle">符号出现权重（控制老虎机各职业符号出率）</sys:String>
+    <sys:String x:Key="CardSymbolsHint">调高目标符号权重即可定向抽对应职业</sys:String>
+    <sys:String x:Key="SymW">W 剑</sys:String>
+    <sys:String x:Key="SymA">A 弓</sys:String>
+    <sys:String x:Key="SymS">S 枪</sys:String>
+    <sys:String x:Key="SymH">H 骑</sys:String>
+    <sys:String x:Key="SymM">M 法</sys:String>
+    <sys:String x:Key="SymD">D 皇冠</sys:String>
+    <sys:String x:Key="BtnApplySymbols">应用符号权重</sys:String>
+    <sys:String x:Key="BtnEqualSymbols">六系均分 (16.7%)</sys:String>
+    <sys:String x:Key="BtnRestoreSymbols">恢复默认权重</sys:String>
+
+    <!-- Page 3: Units -->
+    <sys:String x:Key="BtnRefreshUnits">刷新单位列表</sys:String>
+    <sys:String x:Key="BtnBoostAtk">全员攻击 ×2</sys:String>
+    <sys:String x:Key="BtnBoostHp">全员生命 ×2</sys:String>
+    <sys:String x:Key="BtnBoostAspd">全员攻速 ×1.5</sys:String>
+    <sys:String x:Key="UnitColSym">符号</sys:String>
+    <sys:String x:Key="UnitColName">单位</sys:String>
+    <sys:String x:Key="UnitColGrade">品质</sys:String>
+    <sys:String x:Key="UnitColRank">星级</sys:String>
+    <sys:String x:Key="UnitColAbsorb">吸收 LV</sys:String>
+    <sys:String x:Key="UnitColAtk">攻击力</sys:String>
+    <sys:String x:Key="UnitColHp">生命值</sys:String>
+    <sys:String x:Key="UnitColAspd">攻速</sys:String>
+    <sys:String x:Key="UnitColSlots">刻印槽</sys:String>
+
+    <sys:String x:Key="CardUnitEditTitle">精准编辑选中单位（同步战场实体，写入前实时校验身份）</sys:String>
+    <sys:String x:Key="LblAtk">攻击</sys:String>
+    <sys:String x:Key="LblHp">生命</sys:String>
+    <sys:String x:Key="LblAspd">攻速</sys:String>
+    <sys:String x:Key="LblAbsorb">吸收LV</sys:String>
+    <sys:String x:Key="LblSlots">刻印槽</sys:String>
+    <sys:String x:Key="BtnApplyUnit">应用修改</sys:String>
+
+    <!-- Page 4: Logs & Footer -->
+    <sys:String x:Key="CardLogTitle">内存读写与安全防护日志</sys:String>
+    <sys:String x:Key="BtnClearLog">清空日志</sys:String>
+    <sys:String x:Key="ToastReady">纯外部内存安全模式已就绪（不修改任何游戏文件，不注入 DLL）</sys:String>
+    <sys:String x:Key="StatusSearching">正在搜索 Slotbound.exe 进程...</sys:String>
+
+    <!-- Dynamic Formats (used in code-behind) -->
+    <sys:String x:Key="FmtScanning">正在扫描 Slotbound.exe 内存中的 LuaJIT 状态...</sys:String>
+    <sys:String x:Key="FmtConnected">已安全连接  ·  PID {0}  ·  _G 0x{1:X}</sys:String>
+    <sys:String x:Key="FmtDisconnected">未连接游戏进程</sys:String>
+    <sys:String x:Key="FmtLostConn">游戏连接已断开（已自动解除所有锁定）</sys:String>
+    <sys:String x:Key="FmtGameInfo">阶段: {0}   |   关卡: {1:0}   |   波次: {2:0}   |   队列单位: {3}   |   战场我方/敌方: {4} / {5}{6}</sys:String>
+    <sys:String x:Key="FmtMenuPaused">   [主菜单中 · 局内锁定已自动暂停]</sys:String>
+    <sys:String x:Key="FmtCurrentPct">当前: {0:0.##}%</sys:String>
+    <sys:String x:Key="FmtRaritySum">当前输入总和: {0:0.##}%</sys:String>
+    <sys:String x:Key="MsgUnlockedAll">已解除全部锁定项并恢复默认游戏设置。</sys:String>
+    <sys:String x:Key="MsgMenuPausedLog">检测到处于主菜单 (phase=menu)，已自动暂停局内锁定写入。</sys:String>
+    <sys:String x:Key="MsgMenuResumedLog">已进入对局，局内锁定自动恢复生效。</sys:String>
+    <sys:String x:Key="MsgZeroSpinOn">已开启：免费无限付费旋转（费用归零且解除每波上限）。</sys:String>
+    <sys:String x:Key="MsgZeroSpinOff">已关闭：已恢复付费旋转默认价格与上限。</sys:String>
+    <sys:String x:Key="MsgFreeShopOn">已开启：商店免费重掷。</sys:String>
+    <sys:String x:Key="MsgFreeShopOff">已关闭：已恢复商店默认重掷费用。</sys:String>
+    <sys:String x:Key="MsgForceWinOn">已开启：老虎机每次旋转必中。</sys:String>
+    <sys:String x:Key="MsgForceWinOff">已关闭：老虎机必中已复位。</sys:String>
+    <sys:String x:Key="MsgHealedAllies">已治愈战场上 {0} 名我方单位。</sys:String>
+    <sys:String x:Key="MsgWeakenedEnemies">已将战场上 {0} 名敌人血量设为 1 HP。</sys:String>
+    <sys:String x:Key="MsgOddsRefreshed">已从游戏内存刷新最新概率配置。</sys:String>
+    <sys:String x:Key="MsgInvalidRarity">稀有度概率输入无效，请填入 0~100 的合法数字。</sys:String>
+    <sys:String x:Key="MsgZeroRarityGuard">[安全拦截] 稀有度总概率不能为 0%，请至少保留一项大于 0。</sys:String>
+    <sys:String x:Key="MsgRaritySet">已设置稀有度概率: 普通 {0}% / 高级 {1}% / 稀有 {2}% / 传说 {3}% / 棱彩 {4}%</sys:String>
+    <sys:String x:Key="MsgPresetApplied">已应用预设：{0}</sys:String>
+    <sys:String x:Key="MsgRarityRestored">已恢复游戏默认稀有度概率</sys:String>
+    <sys:String x:Key="MsgInvalidForceWin">中奖概率输入无效，请填入 0~100 的数字。</sys:String>
+    <sys:String x:Key="MsgForceWinSet">已设置强制中奖概率 = {0:0.##}%</sys:String>
+    <sys:String x:Key="MsgForceWinZero">已将老虎机强制中奖概率归零</sys:String>
+    <sys:String x:Key="MsgInvalidSymbols">符号权重输入无效，请填入 0~100 的数字。</sys:String>
+    <sys:String x:Key="MsgZeroSymbolsGuard">[安全拦截] 符号总权重不能为 0%，请至少保留一项大于 0。</sys:String>
+    <sys:String x:Key="MsgSymbolsSet">已设置符号权重: W={0}% A={1}% S={2}% H={3}% M={4}% D={5}%</sys:String>
+    <sys:String x:Key="MsgSymbolsEqual">已将六大职业符号权重设为均分</sys:String>
+    <sys:String x:Key="MsgSymbolsRestored">已恢复默认符号权重</sys:String>
+    <sys:String x:Key="MsgBoostAtk">已将 {0} 名单位攻击力翻倍（含战场实体与词条倍率同步）。</sys:String>
+    <sys:String x:Key="MsgBoostHp">已将 {0} 名单位生命值翻倍（含战场实体与词条倍率同步）。</sys:String>
+    <sys:String x:Key="MsgBoostAspd">已将 {0} 名单位攻速提升 1.5 倍。</sys:String>
+    <sys:String x:Key="MsgSelectUnitFirst">请先在上方表格中选中一名单位。</sys:String>
+    <sys:String x:Key="MsgUnitUpdated">[成功] 已更新单位 #{0} {1}: 攻击={2:0.##}, 生命={3:0.##}, 攻速={4:0.###}</sys:String>
+    <sys:String x:Key="MsgUnitBlocked">[已拦截] 单位 #{0} ({1}) 状态已变化，已中止写入并自动刷新列表。</sys:String>
+    <sys:String x:Key="MsgInvalidNum">输入格式无效，请输入合法数字 ({0})。</sys:String>
+    <sys:String x:Key="MsgNotAttached">尚未附加到 Slotbound.exe 进程。</sys:String>
+    <sys:String x:Key="MsgWriteOk">[成功] {0}</sys:String>
+    <sys:String x:Key="MsgWriteFail">[失败] 当前阶段未能安全写入该字段: {0}</sys:String>
+    <sys:String x:Key="MsgSetItem">设置{0} = {1:0.##}</sys:String>
+    <sys:String x:Key="MsgAddItem">{0} +{1:0.##} -> {2:0.##}</sys:String>
+    <sys:String x:Key="MsgLogCleared">日志已清空。</sys:String>
+    <sys:String x:Key="MsgLangSwitched">界面语言已切换为：简体中文</sys:String>
+</ResourceDictionary>

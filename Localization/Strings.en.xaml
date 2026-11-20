@@ -1,0 +1,162 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="AppTitle">Slotbound Memory Trainer</sys:String>
+    <sys:String x:Key="BtnLangSwitch">中文</sys:String>
+    <sys:String x:Key="BtnUnlockAll">Unlock All</sys:String>
+    <sys:String x:Key="BtnAttach">Re-attach</sys:String>
+
+    <!-- Navigation -->
+    <sys:String x:Key="NavResources">Resources &amp; Cheats</sys:String>
+    <sys:String x:Key="NavOdds">Drop Rates</sys:String>
+    <sys:String x:Key="NavUnits">Roster Units</sys:String>
+    <sys:String x:Key="NavLogs">Logs</sys:String>
+
+    <!-- Page 1: Resources -->
+    <sys:String x:Key="CardResourcesTitle">Core Value Editor</sys:String>
+    <sys:String x:Key="CardResourcesHint">Click Set or press Enter to apply · Native in-game icons</sys:String>
+    <sys:String x:Key="ColItem">Item</sys:String>
+    <sys:String x:Key="ColCurrent">Live Value</sys:String>
+    <sys:String x:Key="ColTarget">Target Value</sys:String>
+    <sys:String x:Key="ColQuick">Quick Add</sys:String>
+    <sys:String x:Key="ColLock">Freeze</sys:String>
+
+    <sys:String x:Key="ResCoins">Gold</sys:String>
+    <sys:String x:Key="ResEssence">Essence</sys:String>
+    <sys:String x:Key="ResSpins">Spins Left</sys:String>
+    <sys:String x:Key="ResFreeSpins">Free Spins</sys:String>
+    <sys:String x:Key="ResCoreRerolls">Core Rerolls</sys:String>
+    <sys:String x:Key="ResBaseHp">Base HP</sys:String>
+    <sys:String x:Key="ResOriginite">Run Originite</sys:String>
+
+    <sys:String x:Key="BtnSet">Set</sys:String>
+    <sys:String x:Key="BtnSet999">Set 999</sys:String>
+    <sys:String x:Key="LblLock">Freeze</sys:String>
+    <sys:String x:Key="HintOriginite">Meta on run end</sys:String>
+
+    <!-- Page 1: Toggles -->
+    <sys:String x:Key="CardTogglesTitle">Slot, Shop &amp; Battle Cheats</sys:String>
+    <sys:String x:Key="SwZeroSpinTitle">Free Unlimited Paid Spins</sys:String>
+    <sys:String x:Key="SwZeroSpinDesc">Zero spin cost &amp; unlock per-wave spin limit</sys:String>
+    <sys:String x:Key="SwFreeShopTitle">Free Shop Reroll</sys:String>
+    <sys:String x:Key="SwFreeShopDesc">Set shop item reroll cost to 0</sys:String>
+    <sys:String x:Key="SwForceWinTitle">Guaranteed Slot Win</sys:String>
+    <sys:String x:Key="SwForceWinDesc">Freeze native forceWinOnce flag to true</sys:String>
+    <sys:String x:Key="SwGodAlliesTitle">Ally God Mode</sys:String>
+    <sys:String x:Key="SwGodAlliesDesc">Keep all living allies at full HP in battle</sys:String>
+    <sys:String x:Key="SwOneHitTitle">One-Hit Enemies (1 HP)</sys:String>
+    <sys:String x:Key="SwOneHitDesc">Set enemy HP to 1 while preserving kill rewards</sys:String>
+    <sys:String x:Key="BtnHealAllies">Heal All Allies</sys:String>
+    <sys:String x:Key="BtnWeakenEnemies">Enemies 1 HP</sys:String>
+
+    <!-- Page 2: Probabilities -->
+    <sys:String x:Key="CardRarityTitle">Rarity Drop Rate Editor</sys:String>
+    <sys:String x:Key="BtnRefreshRead">Refresh</sys:String>
+    <sys:String x:Key="GradeNormal">Normal</sys:String>
+    <sys:String x:Key="GradeAdvanced">Advanced</sys:String>
+    <sys:String x:Key="GradeRare">Rare</sys:String>
+    <sys:String x:Key="GradeLegendary">Legendary</sys:String>
+    <sys:String x:Key="GradePrism">Prism</sys:String>
+    <sys:String x:Key="BtnApplyRarity">Apply Rarity Rates</sys:String>
+    <sys:String x:Key="BtnPresetLeg">100% Legendary</sys:String>
+    <sys:String x:Key="BtnPresetPrism">100% Prism</sys:String>
+    <sys:String x:Key="BtnPresetHalf">50% Leg + 50% Prism</sys:String>
+    <sys:String x:Key="BtnRestoreDefault">Restore Default</sys:String>
+
+    <sys:String x:Key="CardForceWinTitle">Forced Slot Win Rate (forceWinProb)</sys:String>
+    <sys:String x:Key="CardForceWinDesc">Modify underlying win probability (100% = win every spin, clears suppress rate)</sys:String>
+    <sys:String x:Key="BtnApply">Apply</sys:String>
+    <sys:String x:Key="BtnForce100">100% Win</sys:String>
+    <sys:String x:Key="BtnZero">Reset 0%</sys:String>
+
+    <sys:String x:Key="CardSymbolsTitle">Symbol Weights (Slot Class Appearance Rate)</sys:String>
+    <sys:String x:Key="CardSymbolsHint">Increase target symbol weight to focus on specific classes</sys:String>
+    <sys:String x:Key="SymW">W Sword</sys:String>
+    <sys:String x:Key="SymA">A Bow</sys:String>
+    <sys:String x:Key="SymS">S Spear</sys:String>
+    <sys:String x:Key="SymH">H Cavalry</sys:String>
+    <sys:String x:Key="SymM">M Mage</sys:String>
+    <sys:String x:Key="SymD">D Crown</sys:String>
+    <sys:String x:Key="BtnApplySymbols">Apply Weights</sys:String>
+    <sys:String x:Key="BtnEqualSymbols">Equalize (16.7%)</sys:String>
+    <sys:String x:Key="BtnRestoreSymbols">Restore Default</sys:String>
+
+    <!-- Page 3: Units -->
+    <sys:String x:Key="BtnRefreshUnits">Refresh Roster</sys:String>
+    <sys:String x:Key="BtnBoostAtk">All ATK ×2</sys:String>
+    <sys:String x:Key="BtnBoostHp">All HP ×2</sys:String>
+    <sys:String x:Key="BtnBoostAspd">All ASPD ×1.5</sys:String>
+    <sys:String x:Key="UnitColSym">Sym</sys:String>
+    <sys:String x:Key="UnitColName">Unit</sys:String>
+    <sys:String x:Key="UnitColGrade">Grade</sys:String>
+    <sys:String x:Key="UnitColRank">Rank</sys:String>
+    <sys:String x:Key="UnitColAbsorb">Absorb</sys:String>
+    <sys:String x:Key="UnitColAtk">ATK</sys:String>
+    <sys:String x:Key="UnitColHp">HP</sys:String>
+    <sys:String x:Key="UnitColAspd">ASPD</sys:String>
+    <sys:String x:Key="UnitColSlots">Slots</sys:String>
+
+    <sys:String x:Key="CardUnitEditTitle">Edit Selected Unit (Live battlefield sync &amp; identity guard)</sys:String>
+    <sys:String x:Key="LblAtk">ATK</sys:String>
+    <sys:String x:Key="LblHp">HP</sys:String>
+    <sys:String x:Key="LblAspd">ASPD</sys:String>
+    <sys:String x:Key="LblAbsorb">Absorb</sys:String>
+    <sys:String x:Key="LblSlots">Slots</sys:String>
+    <sys:String x:Key="BtnApplyUnit">Apply Changes</sys:String>
+
+    <!-- Page 4: Logs & Footer -->
+    <sys:String x:Key="CardLogTitle">Memory Access &amp; Safety Guard Logs</sys:String>
+    <sys:String x:Key="BtnClearLog">Clear Logs</sys:String>
+    <sys:String x:Key="ToastReady">Pure external memory mode ready (zero file edits, zero DLL injection)</sys:String>
+    <sys:String x:Key="StatusSearching">Searching for Slotbound.exe...</sys:String>
+
+    <!-- Dynamic Formats (used in code-behind) -->
+    <sys:String x:Key="FmtScanning">Scanning LuaJIT runtime state in Slotbound.exe...</sys:String>
+    <sys:String x:Key="FmtConnected">Connected  ·  PID {0}  ·  _G 0x{1:X}</sys:String>
+    <sys:String x:Key="FmtDisconnected">Not attached to game process</sys:String>
+    <sys:String x:Key="FmtLostConn">Game disconnected (all freezes cleared automatically)</sys:String>
+    <sys:String x:Key="FmtGameInfo">Phase: {0}   |   Stage: {1:0}   |   Wave: {2:0}   |   Roster: {3}   |   Allies/Enemies: {4} / {5}{6}</sys:String>
+    <sys:String x:Key="FmtMenuPaused">   [In Menu · Run freezes paused]</sys:String>
+    <sys:String x:Key="FmtCurrentPct">Now: {0:0.##}%</sys:String>
+    <sys:String x:Key="FmtRaritySum">Input Total: {0:0.##}%</sys:String>
+    <sys:String x:Key="MsgUnlockedAll">Cleared all freezes and restored default game settings.</sys:String>
+    <sys:String x:Key="MsgMenuPausedLog">Main menu detected (phase=menu); in-run freezes paused automatically.</sys:String>
+    <sys:String x:Key="MsgMenuResumedLog">Entered active run; freezes resumed.</sys:String>
+    <sys:String x:Key="MsgZeroSpinOn">Enabled: Free unlimited paid spins (0 cost &amp; wave limit removed).</sys:String>
+    <sys:String x:Key="MsgZeroSpinOff">Disabled: Restored default spin cost &amp; wave limit.</sys:String>
+    <sys:String x:Key="MsgFreeShopOn">Enabled: Free shop reroll.</sys:String>
+    <sys:String x:Key="MsgFreeShopOff">Disabled: Restored default shop reroll cost.</sys:String>
+    <sys:String x:Key="MsgForceWinOn">Enabled: Guaranteed slot win.</sys:String>
+    <sys:String x:Key="MsgForceWinOff">Disabled: Guaranteed slot win reset.</sys:String>
+    <sys:String x:Key="MsgHealedAllies">Healed {0} living allies on the battlefield.</sys:String>
+    <sys:String x:Key="MsgWeakenedEnemies">Set {0} battlefield enemies to 1 HP.</sys:String>
+    <sys:String x:Key="MsgOddsRefreshed">Refreshed drop rates from live game memory.</sys:String>
+    <sys:String x:Key="MsgInvalidRarity">Invalid rarity input. Please enter numbers between 0 and 100.</sys:String>
+    <sys:String x:Key="MsgZeroRarityGuard">[Safety Guard] Total rarity rate cannot be 0%.</sys:String>
+    <sys:String x:Key="MsgRaritySet">Set rarity rates: Normal {0}% / Adv {1}% / Rare {2}% / Leg {3}% / Prism {4}%</sys:String>
+    <sys:String x:Key="MsgPresetApplied">Applied preset: {0}</sys:String>
+    <sys:String x:Key="MsgRarityRestored">Restored default rarity drop rates</sys:String>
+    <sys:String x:Key="MsgInvalidForceWin">Invalid win rate input. Please enter a number between 0 and 100.</sys:String>
+    <sys:String x:Key="MsgForceWinSet">Set forced win rate = {0:0.##}%</sys:String>
+    <sys:String x:Key="MsgForceWinZero">Reset forced win rate to 0%</sys:String>
+    <sys:String x:Key="MsgInvalidSymbols">Invalid symbol weight input. Please enter numbers between 0 and 100.</sys:String>
+    <sys:String x:Key="MsgZeroSymbolsGuard">[Safety Guard] Total symbol weight cannot be 0%.</sys:String>
+    <sys:String x:Key="MsgSymbolsSet">Set symbol weights: W={0}% A={1}% S={2}% H={3}% M={4}% D={5}%</sys:String>
+    <sys:String x:Key="MsgSymbolsEqual">Equalized all 6 class symbol weights</sys:String>
+    <sys:String x:Key="MsgSymbolsRestored">Restored default symbol weights</sys:String>
+    <sys:String x:Key="MsgBoostAtk">Doubled ATK for {0} roster units (synced with battlefield &amp; multipliers).</sys:String>
+    <sys:String x:Key="MsgBoostHp">Doubled HP for {0} roster units (synced with battlefield &amp; multipliers).</sys:String>
+    <sys:String x:Key="MsgBoostAspd">Boosted ASPD ×1.5 for {0} roster units.</sys:String>
+    <sys:String x:Key="MsgSelectUnitFirst">Please select a unit in the table above first.</sys:String>
+    <sys:String x:Key="MsgUnitUpdated">[OK] Updated unit #{0} {1}: ATK={2:0.##}, HP={3:0.##}, ASPD={4:0.###}</sys:String>
+    <sys:String x:Key="MsgUnitBlocked">[Blocked] Unit #{0} ({1}) changed since refresh; write aborted safely.</sys:String>
+    <sys:String x:Key="MsgInvalidNum">Invalid number format ({0}).</sys:String>
+    <sys:String x:Key="MsgNotAttached">Not attached to Slotbound.exe.</sys:String>
+    <sys:String x:Key="MsgWriteOk">[OK] {0}</sys:String>
+    <sys:String x:Key="MsgWriteFail">[Failed] Field unavailable in current game phase: {0}</sys:String>
+    <sys:String x:Key="MsgSetItem">Set {0} = {1:0.##}</sys:String>
+    <sys:String x:Key="MsgAddItem">{0} +{1:0.##} -> {2:0.##}</sys:String>
+    <sys:String x:Key="MsgLogCleared">Logs cleared.</sys:String>
+    <sys:String x:Key="MsgLangSwitched">Language switched to: English</sys:String>
+</ResourceDictionary>

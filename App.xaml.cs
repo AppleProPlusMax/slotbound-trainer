@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Windows;
+using SlotboundTrainer.Localization;
 using SlotboundTrainer.Memory;
 
 namespace SlotboundTrainer;
@@ -15,6 +16,8 @@ public partial class App : Application
             Shutdown(0);
             return;
         }
+
+        LangManager.InitDefault();
 
         DispatcherUnhandledException += (_, ex) =>
         {

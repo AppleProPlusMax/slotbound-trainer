@@ -1,10 +1,12 @@
 # SlotboundTrainer — Slotbound 纯内存修改器
 
+**[简体中文](README.md) | [English](README_EN.md)**
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/AppleProPlusMax/slotbound-trainer)](https://github.com/AppleProPlusMax/slotbound-trainer/releases)
 [![Platform](https://img.shields.io/badge/Platform-Windows_x64-0078D6.svg)](#编译与运行)
 
-面向 **Slotbound**（LÖVE 11.5 / LuaJIT 2.1 GC64 x64）的纯外部内存修改器，采用 **.NET 6 WPF** 打造暗夜鎏金现代界面，所有功能图标均与游戏内原版图标 1:1 对应。
+面向 **Slotbound**（LÖVE 11.5 / LuaJIT 2.1 GC64 x64）的纯外部内存修改器，采用 **.NET 6 WPF** 打造暗夜鎏金现代界面，支持**一键实时中英文切换**，所有功能图标均与游戏内原版图标 1:1 对应。
 
 ## 界面预览
 

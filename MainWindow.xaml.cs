@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using SlotboundTrainer.Localization;
 using SlotboundTrainer.Memory;
 
 namespace SlotboundTrainer;
@@ -30,6 +31,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        RefreshLocalizedDynamicControls();
 
         SourceInitialized += (_, _) => EnableDarkTitleBar();
         Loaded += async (_, _) => await AttachAsync();
@@ -56,11 +58,41 @@ public partial class MainWindow : Window
         {
             IntPtr hwnd = new WindowInteropHelper(this).Handle;
             int useDark = 1;
-            // Windows 11 / Windows 10 20H1+ (DWMWA_USE_IMMERSIVE_DARK_MODE = 20, fallback 19)
             if (NativeMethods.DwmSetWindowAttribute(hwnd, 20, ref useDark, sizeof(int)) != 0)
                 NativeMethods.DwmSetWindowAttribute(hwnd, 19, ref useDark, sizeof(int));
         }
         catch { /* ignore on older Windows */ }
+    }
+
+    private void BtnLang_Click(object sender, RoutedEventArgs e)
+    {
+        LangManager.Toggle();
+        RefreshLocalizedDynamicControls();
+        if (_engine.IsAttached)
+        {
+            TxtStatus.Text = LangManager.F("FmtConnected", _engine.ProcessId, _engine.GlobalTableAddress);
+            RefreshOddsUI(syncInputs: false);
+            RefreshUnitsGrid();
+        }
+        else
+        {
+            TxtStatus.Text = LangManager.T("FmtDisconnected");
+        }
+        Log(LangManager.T("MsgLangSwitched"), BrushGreen);
+    }
+
+    private void RefreshLocalizedDynamicControls()
+    {
+        ColUnitSym.Header = LangManager.T("UnitColSym");
+        ColUnitName.Header = LangManager.T("UnitColName");
+        ColUnitGrade.Header = LangManager.T("UnitColGrade");
+        ColUnitRank.Header = LangManager.T("UnitColRank");
+        ColUnitAbsorb.Header = LangManager.T("UnitColAbsorb");
+        ColUnitAtk.Header = LangManager.T("UnitColAtk");
+        ColUnitHp.Header = LangManager.T("UnitColHp");
+        ColUnitAspd.Header = LangManager.T("UnitColAspd");
+        ColUnitSlots.Header = LangManager.T("UnitColSlots");
+        UpdateRaritySumLabel();
     }
 
     private void NavTab_Checked(object sender, RoutedEventArgs e)
@@ -83,7 +115,7 @@ public partial class MainWindow : Window
         ClearAllLocks(restoreToggles: false);
 
         StatusDot.Fill = BrushGold;
-        TxtStatus.Text = "正在扫描 Slotbound.exe 内存中的 LuaJIT 状态...";
+        TxtStatus.Text = LangManager.T("FmtScanning");
         TxtStatus.Foreground = BrushGold;
 
         string msg = "";
@@ -95,16 +127,16 @@ public partial class MainWindow : Window
         if (ok)
         {
             StatusDot.Fill = BrushGreen;
-            TxtStatus.Text = $"已安全连接  ·  PID {_engine.ProcessId}  ·  _G 0x{_engine.GlobalTableAddress:X}";
+            TxtStatus.Text = LangManager.F("FmtConnected", _engine.ProcessId, _engine.GlobalTableAddress);
             TxtStatus.Foreground = BrushGreen;
-            Log(msg, BrushGreen);
+            Log(LangManager.IsEnglish ? $"Attached to Slotbound.exe (PID {_engine.ProcessId}, _G 0x{_engine.GlobalTableAddress:X})" : msg, BrushGreen);
             RefreshUnitsGrid();
             RefreshOddsUI(syncInputs: true);
         }
         else
         {
             StatusDot.Fill = BrushRed;
-            TxtStatus.Text = "未连接游戏进程";
+            TxtStatus.Text = LangManager.T("FmtDisconnected");
             TxtStatus.Foreground = BrushRed;
             Log(msg, BrushRed);
         }
@@ -121,13 +153,14 @@ public partial class MainWindow : Window
             {
                 ClearAllLocks(restoreToggles: false);
                 StatusDot.Fill = BrushRed;
-                TxtStatus.Text = "游戏连接已断开（已自动解除所有锁定）";
+                TxtStatus.Text = LangManager.T("FmtLostConn");
                 TxtStatus.Foreground = BrushRed;
                 return;
             }
 
-            string menuNote = snap.IsInMenu ? "   [主菜单中 · 局内锁定已自动暂停]" : "";
-            TxtGameInfo.Text = $"阶段: {snap.Phase}   |   关卡: {snap.Stage:0}   |   波次: {snap.WaveId:0}   |   队列单位: {snap.RosterCount}   |   战场我方/敌方: {snap.AlliesCount} / {snap.EnemiesCount}{menuNote}";
+            string menuNote = snap.IsInMenu ? LangManager.T("FmtMenuPaused") : "";
+            TxtGameInfo.Text = LangManager.F("FmtGameInfo",
+                snap.Phase, snap.Stage, snap.WaveId, snap.RosterCount, snap.AlliesCount, snap.EnemiesCount, menuNote);
 
             TxtCoinsCur.Text = snap.Coins.ToString("0.##", CultureInfo.InvariantCulture);
             TxtJungsuCur.Text = snap.Jungsu.ToString("0.##", CultureInfo.InvariantCulture);
@@ -142,14 +175,14 @@ public partial class MainWindow : Window
                 if (!_wasInMenu)
                 {
                     _wasInMenu = true;
-                    Log("检测到处于主菜单 (phase=menu)，已自动暂停局内锁定写入。", BrushGold);
+                    Log(LangManager.T("MsgMenuPausedLog"), BrushGold);
                 }
                 return;
             }
             if (_wasInMenu)
             {
                 _wasInMenu = false;
-                Log("已进入对局，局内锁定自动恢复生效。", BrushGreen);
+                Log(LangManager.T("MsgMenuResumedLog"), BrushGreen);
             }
 
             if (SwLockCoins.IsChecked == true && TryParseBox(BoxCoins, out double c)) _engine.SetCoins(c);
@@ -168,7 +201,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            Log($"[异常] 轮询刷新出错: {ex.Message}", BrushRed);
+            Log($"[Error] {ex.Message}", BrushRed);
         }
         finally
         {
@@ -209,7 +242,7 @@ public partial class MainWindow : Window
     private void BtnUnlockAll_Click(object sender, RoutedEventArgs e)
     {
         ClearAllLocks(restoreToggles: true);
-        Log("已解除全部锁定项并恢复默认游戏设置。", BrushGold);
+        Log(LangManager.T("MsgUnlockedAll"), BrushGold);
     }
 
     private void Input_KeyDown(object sender, KeyEventArgs e)
@@ -228,33 +261,33 @@ public partial class MainWindow : Window
         }
     }
 
-    private void BtnSetCoins_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxCoins, v => _engine.SetCoins(v), "金币");
-    private void BtnAddCoins1k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Coins, 1000, v => _engine.SetCoins(v), "金币");
-    private void BtnAddCoins10k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Coins, 10000, v => _engine.SetCoins(v), "金币");
+    private void BtnSetCoins_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxCoins, v => _engine.SetCoins(v), LangManager.T("ResCoins"));
+    private void BtnAddCoins1k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Coins, 1000, v => _engine.SetCoins(v), LangManager.T("ResCoins"));
+    private void BtnAddCoins10k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Coins, 10000, v => _engine.SetCoins(v), LangManager.T("ResCoins"));
 
-    private void BtnSetJungsu_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxJungsu, v => _engine.SetJungsu(v), "精华");
-    private void BtnAddJungsu50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Jungsu, 50, v => _engine.SetJungsu(v), "精华");
-    private void BtnAddJungsu500_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Jungsu, 500, v => _engine.SetJungsu(v), "精华");
+    private void BtnSetJungsu_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxJungsu, v => _engine.SetJungsu(v), LangManager.T("ResEssence"));
+    private void BtnAddJungsu50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Jungsu, 50, v => _engine.SetJungsu(v), LangManager.T("ResEssence"));
+    private void BtnAddJungsu500_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.Jungsu, 500, v => _engine.SetJungsu(v), LangManager.T("ResEssence"));
 
-    private void BtnSetSpins_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxSpins, v => _engine.SetSpinsLeft(v), "剩余旋转");
-    private void BtnAddSpins10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.SpinsLeft, 10, v => _engine.SetSpinsLeft(v), "剩余旋转");
-    private void BtnAddSpins50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.SpinsLeft, 50, v => _engine.SetSpinsLeft(v), "剩余旋转");
+    private void BtnSetSpins_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxSpins, v => _engine.SetSpinsLeft(v), LangManager.T("ResSpins"));
+    private void BtnAddSpins10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.SpinsLeft, 10, v => _engine.SetSpinsLeft(v), LangManager.T("ResSpins"));
+    private void BtnAddSpins50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.SpinsLeft, 50, v => _engine.SetSpinsLeft(v), LangManager.T("ResSpins"));
 
-    private void BtnSetFreeSpins_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxFreeSpins, v => _engine.SetFreeSpinCredits(v), "免费旋转次数");
-    private void BtnAddFreeSpins10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.FreeSpinCredits, 10, v => _engine.SetFreeSpinCredits(v), "免费旋转次数");
-    private void BtnAddFreeSpins50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.FreeSpinCredits, 50, v => _engine.SetFreeSpinCredits(v), "免费旋转次数");
+    private void BtnSetFreeSpins_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxFreeSpins, v => _engine.SetFreeSpinCredits(v), LangManager.T("ResFreeSpins"));
+    private void BtnAddFreeSpins10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.FreeSpinCredits, 10, v => _engine.SetFreeSpinCredits(v), LangManager.T("ResFreeSpins"));
+    private void BtnAddFreeSpins50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.FreeSpinCredits, 50, v => _engine.SetFreeSpinCredits(v), LangManager.T("ResFreeSpins"));
 
-    private void BtnSetRerolls_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxRerolls, v => _engine.SetCoreFreeRerolls(v), "核心免费重掷");
-    private void BtnAddRerolls10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.CoreFreeRerolls, 10, v => _engine.SetCoreFreeRerolls(v), "核心免费重掷");
-    private void BtnAddRerolls50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.CoreFreeRerolls, 50, v => _engine.SetCoreFreeRerolls(v), "核心免费重掷");
+    private void BtnSetRerolls_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxRerolls, v => _engine.SetCoreFreeRerolls(v), LangManager.T("ResCoreRerolls"));
+    private void BtnAddRerolls10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.CoreFreeRerolls, 10, v => _engine.SetCoreFreeRerolls(v), LangManager.T("ResCoreRerolls"));
+    private void BtnAddRerolls50_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.CoreFreeRerolls, 50, v => _engine.SetCoreFreeRerolls(v), LangManager.T("ResCoreRerolls"));
 
-    private void BtnSetBaseHp_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxBaseHp, v => _engine.SetBaseHp(v), "基地生命");
-    private void BtnAddBaseHp10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.BaseHp, 10, v => _engine.SetBaseHp(v), "基地生命");
-    private void BtnSetBaseHp999_Click(object sender, RoutedEventArgs e) => ExecWrite(() => _engine.SetBaseHp(999), "设置基地生命 = 999");
+    private void BtnSetBaseHp_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxBaseHp, v => _engine.SetBaseHp(v), LangManager.T("ResBaseHp"));
+    private void BtnAddBaseHp10_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.BaseHp, 10, v => _engine.SetBaseHp(v), LangManager.T("ResBaseHp"));
+    private void BtnSetBaseHp999_Click(object sender, RoutedEventArgs e) => ExecWrite(() => _engine.SetBaseHp(999), LangManager.F("MsgSetItem", LangManager.T("ResBaseHp"), 999));
 
-    private void BtnSetOriginite_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxOriginite, v => _engine.SetOriginiteEarned(v), "本局源石");
-    private void BtnAddOriginite1k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.OriginiteEarned, 1000, v => _engine.SetOriginiteEarned(v), "本局源石");
-    private void BtnAddOriginite10k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.OriginiteEarned, 10000, v => _engine.SetOriginiteEarned(v), "本局源石");
+    private void BtnSetOriginite_Click(object sender, RoutedEventArgs e) => SetFromBox(BoxOriginite, v => _engine.SetOriginiteEarned(v), LangManager.T("ResOriginite"));
+    private void BtnAddOriginite1k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.OriginiteEarned, 1000, v => _engine.SetOriginiteEarned(v), LangManager.T("ResOriginite"));
+    private void BtnAddOriginite10k_Click(object sender, RoutedEventArgs e) => AddDelta(s => s.OriginiteEarned, 10000, v => _engine.SetOriginiteEarned(v), LangManager.T("ResOriginite"));
 
     // ==================== Switches & Battle Handlers ====================
 
@@ -264,12 +297,12 @@ public partial class MainWindow : Window
         if (SwZeroSpinCost.IsChecked == true)
         {
             _engine.SetZeroSpinCost();
-            Log("已开启：免费无限付费旋转（费用归零且解除每波上限）。", BrushGreen);
+            Log(LangManager.T("MsgZeroSpinOn"), BrushGreen);
         }
         else
         {
             _engine.RestoreSpinCostDefaults();
-            Log("已关闭：已恢复付费旋转默认价格与上限。", BrushGold);
+            Log(LangManager.T("MsgZeroSpinOff"), BrushGold);
         }
     }
 
@@ -279,12 +312,12 @@ public partial class MainWindow : Window
         if (SwFreeShopReroll.IsChecked == true)
         {
             _engine.SetFreeShopReroll();
-            Log("已开启：商店免费重掷。", BrushGreen);
+            Log(LangManager.T("MsgFreeShopOn"), BrushGreen);
         }
         else
         {
             _engine.RestoreShopRerollCost();
-            Log("已关闭：已恢复商店默认重掷费用。", BrushGold);
+            Log(LangManager.T("MsgFreeShopOff"), BrushGold);
         }
     }
 
@@ -293,19 +326,19 @@ public partial class MainWindow : Window
         if (!_engine.IsAttached) return;
         bool on = SwForceWin.IsChecked == true;
         _engine.SetForceWinOnce(on);
-        Log(on ? "已开启：老虎机每次旋转必中。" : "已关闭：老虎机必中已复位。", on ? BrushGreen : BrushGold);
+        Log(LangManager.T(on ? "MsgForceWinOn" : "MsgForceWinOff"), on ? BrushGreen : BrushGold);
     }
 
     private void BtnHealAllies_Click(object sender, RoutedEventArgs e)
     {
         int n = _engine.HealAlliesFull();
-        Log($"已治愈战场上 {n} 名我方单位。", BrushGreen);
+        Log(LangManager.F("MsgHealedAllies", n), BrushGreen);
     }
 
     private void BtnWeakenEnemies_Click(object sender, RoutedEventArgs e)
     {
         int n = _engine.WeakenAllEnemies(1.0);
-        Log($"已将战场上 {n} 名敌人血量设为 1 HP。", BrushGreen);
+        Log(LangManager.F("MsgWeakenedEnemies", n), BrushGreen);
     }
 
     // ==================== Probability Page Handlers ====================
@@ -316,19 +349,19 @@ public partial class MainWindow : Window
         var p = _engine.ReadProbabilities();
         if (!p.Available) return;
 
-        TxtProbNormalCur.Text = $"当前: {p.NormalPct:0.##}%";
-        TxtProbAdvancedCur.Text = $"当前: {p.AdvancedPct:0.##}%";
-        TxtProbRareCur.Text = $"当前: {p.RarePct:0.##}%";
-        TxtProbLegendaryCur.Text = $"当前: {p.LegendaryPct:0.##}%";
-        TxtProbPrismCur.Text = $"当前: {p.PrismPct:0.##}%";
-        TxtForceWinCur.Text = $"当前: {p.ForceWinPct:0.##}%";
+        TxtProbNormalCur.Text = LangManager.F("FmtCurrentPct", p.NormalPct);
+        TxtProbAdvancedCur.Text = LangManager.F("FmtCurrentPct", p.AdvancedPct);
+        TxtProbRareCur.Text = LangManager.F("FmtCurrentPct", p.RarePct);
+        TxtProbLegendaryCur.Text = LangManager.F("FmtCurrentPct", p.LegendaryPct);
+        TxtProbPrismCur.Text = LangManager.F("FmtCurrentPct", p.PrismPct);
+        TxtForceWinCur.Text = LangManager.F("FmtCurrentPct", p.ForceWinPct);
 
-        TxtSymWCur.Text = $"当前: {p.WeightW:0.##}%";
-        TxtSymACur.Text = $"当前: {p.WeightA:0.##}%";
-        TxtSymSCur.Text = $"当前: {p.WeightS:0.##}%";
-        TxtSymHCur.Text = $"当前: {p.WeightH:0.##}%";
-        TxtSymMCur.Text = $"当前: {p.WeightM:0.##}%";
-        TxtSymDCur.Text = $"当前: {p.WeightD:0.##}%";
+        TxtSymWCur.Text = LangManager.F("FmtCurrentPct", p.WeightW);
+        TxtSymACur.Text = LangManager.F("FmtCurrentPct", p.WeightA);
+        TxtSymSCur.Text = LangManager.F("FmtCurrentPct", p.WeightS);
+        TxtSymHCur.Text = LangManager.F("FmtCurrentPct", p.WeightH);
+        TxtSymMCur.Text = LangManager.F("FmtCurrentPct", p.WeightM);
+        TxtSymDCur.Text = LangManager.F("FmtCurrentPct", p.WeightD);
 
         if (syncInputs)
         {
@@ -363,14 +396,14 @@ public partial class MainWindow : Window
         if (TryParseBox(BoxProbLegendary, out double l)) sum += l;
         if (TryParseBox(BoxProbPrism, out double pr)) sum += pr;
 
-        TxtRaritySum.Text = $"当前输入总和: {sum:0.##}%";
+        TxtRaritySum.Text = LangManager.F("FmtRaritySum", sum);
         TxtRaritySum.Foreground = Math.Abs(sum - 100.0) < 0.05 ? BrushGreen : BrushGold;
     }
 
     private void BtnRefreshOdds_Click(object sender, RoutedEventArgs e)
     {
         RefreshOddsUI(syncInputs: true);
-        Log("已从游戏内存刷新最新概率配置。", BrushGreen);
+        Log(LangManager.T("MsgOddsRefreshed"), BrushGreen);
     }
 
     private void RarityBox_KeyDown(object sender, KeyEventArgs e)
@@ -396,7 +429,7 @@ public partial class MainWindow : Window
     private void BtnClearLog_Click(object sender, RoutedEventArgs e)
     {
         TxtLog.Clear();
-        Log("日志已清空。", BrushSub);
+        Log(LangManager.T("MsgLogCleared"), BrushSub);
     }
 
     private void BtnApplyRarity_Click(object sender, RoutedEventArgs e)
@@ -407,37 +440,38 @@ public partial class MainWindow : Window
             !TryParseBox(BoxProbLegendary, out double l) ||
             !TryParseBox(BoxProbPrism, out double pr))
         {
-            Log("稀有度概率输入无效，请填入 0~100 的合法数字。", BrushRed);
+            Log(LangManager.T("MsgInvalidRarity"), BrushRed);
             return;
         }
         if (n + a + r + l + pr <= 0)
         {
-            Log("[安全拦截] 稀有度总概率不能为 0%，请至少保留一项大于 0。", BrushRed);
+            Log(LangManager.T("MsgZeroRarityGuard"), BrushRed);
             return;
         }
         ExecWrite(() => _engine.SetRarityProbabilities(n, a, r, l, pr),
-            $"已设置稀有度概率: 普通 {n}% / 高级 {a}% / 稀有 {r}% / 传说 {l}% / 棱彩 {pr}%");
+            LangManager.F("MsgRaritySet", n, a, r, l, pr));
         RefreshOddsUI(syncInputs: false);
     }
 
-    private void ApplyRarityPreset(double n, double a, double r, double l, double pr, string label)
+    private void ApplyRarityPreset(double n, double a, double r, double l, double pr, string labelKey)
     {
         BoxProbNormal.Text = n.ToString("0.##", CultureInfo.InvariantCulture);
         BoxProbAdvanced.Text = a.ToString("0.##", CultureInfo.InvariantCulture);
         BoxProbRare.Text = r.ToString("0.##", CultureInfo.InvariantCulture);
         BoxProbLegendary.Text = l.ToString("0.##", CultureInfo.InvariantCulture);
         BoxProbPrism.Text = pr.ToString("0.##", CultureInfo.InvariantCulture);
-        ExecWrite(() => _engine.SetRarityProbabilities(n, a, r, l, pr), $"已应用预设：{label}");
+        ExecWrite(() => _engine.SetRarityProbabilities(n, a, r, l, pr),
+            LangManager.F("MsgPresetApplied", LangManager.T(labelKey)));
         RefreshOddsUI(syncInputs: false);
     }
 
-    private void BtnPresetLegendary_Click(object sender, RoutedEventArgs e) => ApplyRarityPreset(0, 0, 0, 100, 0, "100% 传说");
-    private void BtnPresetPrism_Click(object sender, RoutedEventArgs e) => ApplyRarityPreset(0, 0, 0, 0, 100, "100% 棱彩");
-    private void BtnPresetHalfLegPrism_Click(object sender, RoutedEventArgs e) => ApplyRarityPreset(0, 0, 0, 50, 50, "传说 50% + 棱彩 50%");
+    private void BtnPresetLegendary_Click(object sender, RoutedEventArgs e) => ApplyRarityPreset(0, 0, 0, 100, 0, "BtnPresetLeg");
+    private void BtnPresetPrism_Click(object sender, RoutedEventArgs e) => ApplyRarityPreset(0, 0, 0, 0, 100, "BtnPresetPrism");
+    private void BtnPresetHalfLegPrism_Click(object sender, RoutedEventArgs e) => ApplyRarityPreset(0, 0, 0, 50, 50, "BtnPresetHalf");
 
     private void BtnRestoreRarity_Click(object sender, RoutedEventArgs e)
     {
-        ExecWrite(() => _engine.RestoreDefaultRarityProbabilities(), "已恢复游戏默认稀有度概率");
+        ExecWrite(() => _engine.RestoreDefaultRarityProbabilities(), LangManager.T("MsgRarityRestored"));
         RefreshOddsUI(syncInputs: true);
     }
 
@@ -445,24 +479,24 @@ public partial class MainWindow : Window
     {
         if (!TryParseBox(BoxForceWinProb, out double v))
         {
-            Log("中奖概率输入无效，请填入 0~100 的数字。", BrushRed);
+            Log(LangManager.T("MsgInvalidForceWin"), BrushRed);
             return;
         }
-        ExecWrite(() => _engine.SetSlotWinProbability(v, 0), $"已设置强制中奖概率 = {Math.Clamp(v, 0, 100):0.##}%");
+        ExecWrite(() => _engine.SetSlotWinProbability(v, 0), LangManager.F("MsgForceWinSet", Math.Clamp(v, 0, 100)));
         RefreshOddsUI(syncInputs: false);
     }
 
     private void BtnForceWin100_Click(object sender, RoutedEventArgs e)
     {
         BoxForceWinProb.Text = "100";
-        ExecWrite(() => _engine.SetSlotWinProbability(100, 0), "已设置老虎机强制中奖概率 = 100%");
+        ExecWrite(() => _engine.SetSlotWinProbability(100, 0), LangManager.F("MsgForceWinSet", 100));
         RefreshOddsUI(syncInputs: false);
     }
 
     private void BtnForceWin0_Click(object sender, RoutedEventArgs e)
     {
         BoxForceWinProb.Text = "0";
-        ExecWrite(() => _engine.SetSlotWinProbability(0, 0), "已将老虎机强制中奖概率归零");
+        ExecWrite(() => _engine.SetSlotWinProbability(0, 0), LangManager.T("MsgForceWinZero"));
         RefreshOddsUI(syncInputs: false);
     }
 
@@ -475,16 +509,16 @@ public partial class MainWindow : Window
             !TryParseBox(BoxSymM, out double m) ||
             !TryParseBox(BoxSymD, out double d))
         {
-            Log("符号权重输入无效，请填入 0~100 的数字。", BrushRed);
+            Log(LangManager.T("MsgInvalidSymbols"), BrushRed);
             return;
         }
         if (w + a + s + h + m + d <= 0)
         {
-            Log("[安全拦截] 符号总权重不能为 0%，请至少保留一项大于 0。", BrushRed);
+            Log(LangManager.T("MsgZeroSymbolsGuard"), BrushRed);
             return;
         }
         ExecWrite(() => _engine.SetSymbolWeights(w, a, s, h, m, d),
-            $"已设置符号权重: W={w}% A={a}% S={s}% H={h}% M={m}% D={d}%");
+            LangManager.F("MsgSymbolsSet", w, a, s, h, m, d));
         RefreshOddsUI(syncInputs: false);
     }
 
@@ -496,13 +530,13 @@ public partial class MainWindow : Window
         BoxSymH.Text = "16.7";
         BoxSymM.Text = "16.6";
         BoxSymD.Text = "16.6";
-        ExecWrite(() => _engine.SetSymbolWeights(16.7, 16.7, 16.7, 16.7, 16.6, 16.6), "已将六大职业符号权重设为均分");
+        ExecWrite(() => _engine.SetSymbolWeights(16.7, 16.7, 16.7, 16.7, 16.6, 16.6), LangManager.T("MsgSymbolsEqual"));
         RefreshOddsUI(syncInputs: false);
     }
 
     private void BtnRestoreSymbols_Click(object sender, RoutedEventArgs e)
     {
-        ExecWrite(() => _engine.RestoreDefaultSymbolWeights(), "已恢复默认符号权重");
+        ExecWrite(() => _engine.RestoreDefaultSymbolWeights(), LangManager.T("MsgSymbolsRestored"));
         RefreshOddsUI(syncInputs: true);
     }
 
@@ -513,21 +547,21 @@ public partial class MainWindow : Window
     private void BtnBoostAtk_Click(object sender, RoutedEventArgs e)
     {
         int n = _engine.BoostAllRosterUnits(2.0, 0, 0);
-        Log($"已将 {n} 名单位攻击力翻倍（含战场实体与词条倍率同步）。", BrushGreen);
+        Log(LangManager.F("MsgBoostAtk", n), BrushGreen);
         RefreshUnitsGrid();
     }
 
     private void BtnBoostHp_Click(object sender, RoutedEventArgs e)
     {
         int n = _engine.BoostAllRosterUnits(0, 2.0, 0);
-        Log($"已将 {n} 名单位生命值翻倍（含战场实体与词条倍率同步）。", BrushGreen);
+        Log(LangManager.F("MsgBoostHp", n), BrushGreen);
         RefreshUnitsGrid();
     }
 
     private void BtnBoostAspd_Click(object sender, RoutedEventArgs e)
     {
         int n = _engine.BoostAllRosterUnits(0, 0, 1.5);
-        Log($"已将 {n} 名单位攻速提升 1.5 倍。", BrushGreen);
+        Log(LangManager.F("MsgBoostAspd", n), BrushGreen);
         RefreshUnitsGrid();
     }
 
@@ -572,7 +606,7 @@ public partial class MainWindow : Window
     {
         if (GridUnits.SelectedItem is not RosterUnitInfo u)
         {
-            Log("请先在上方表格中选中一名单位。", BrushGold);
+            Log(LangManager.T("MsgSelectUnitFirst"), BrushGold);
             return;
         }
 
@@ -584,9 +618,9 @@ public partial class MainWindow : Window
 
         bool ok = _engine.UpdateRosterUnitByIdentity(u.Index, u.Symbol, u.Subclass, atk, hp, aspd, absorb, slots);
         if (ok)
-            Log($"[成功] 已更新单位 #{u.Index} {u.DisplayName}: 攻击={atk:0.##}, 生命={hp:0.##}, 攻速={aspd:0.###}", BrushGreen);
+            Log(LangManager.F("MsgUnitUpdated", u.Index, u.DisplayName, atk ?? u.Atk, hp ?? u.Hp, aspd ?? u.Aspd), BrushGreen);
         else
-            Log($"[已拦截] 单位 #{u.Index} ({u.DisplayName}) 状态已变化，已中止写入并自动刷新列表。", BrushRed);
+            Log(LangManager.F("MsgUnitBlocked", u.Index, u.DisplayName), BrushRed);
 
         RefreshUnitsGrid();
     }
@@ -601,30 +635,30 @@ public partial class MainWindow : Window
     {
         if (!TryParseBox(tb, out double val))
         {
-            Log($"输入格式无效，请输入合法数字 ({name})。", BrushRed);
+            Log(LangManager.F("MsgInvalidNum", name), BrushRed);
             return;
         }
-        ExecWrite(() => writer(val), $"设置{name} = {val:0.##}");
+        ExecWrite(() => writer(val), LangManager.F("MsgSetItem", name, val));
     }
 
     private void AddDelta(Func<GameStateSnapshot, double> getter, double delta, Func<double, bool> writer, string name)
     {
-        if (!_engine.IsAttached) { Log("尚未附加游戏进程。", BrushRed); return; }
+        if (!_engine.IsAttached) { Log(LangManager.T("MsgNotAttached"), BrushRed); return; }
         var snap = _engine.ReadSnapshot();
         double next = getter(snap) + delta;
-        ExecWrite(() => writer(next), $"{name} +{delta:0.##} -> {next:0.##}");
+        ExecWrite(() => writer(next), LangManager.F("MsgAddItem", name, delta, next));
     }
 
     private void ExecWrite(Func<bool> action, string msg)
     {
         if (!_engine.IsAttached)
         {
-            Log("尚未附加到 Slotbound.exe 进程。", BrushRed);
+            Log(LangManager.T("MsgNotAttached"), BrushRed);
             return;
         }
         bool ok = action();
-        if (ok) Log($"[成功] {msg}", BrushGreen);
-        else Log($"[失败] 当前阶段未能安全写入该字段: {msg}", BrushRed);
+        if (ok) Log(LangManager.F("MsgWriteOk", msg), BrushGreen);
+        else Log(LangManager.F("MsgWriteFail", msg), BrushRed);
     }
 
     private void Log(string message, Brush? color = null)

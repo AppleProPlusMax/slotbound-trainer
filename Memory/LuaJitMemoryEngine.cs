@@ -13,16 +13,7 @@ public sealed class RosterUnitInfo
     public string Subclass { get; set; } = "";
     public string DisplayName { get; set; } = "";
     public string Grade { get; set; } = "";
-    public string GradeLabel => Grade.ToLowerInvariant() switch
-    {
-        "normal" => "普通",
-        "advanced" => "高级",
-        "rare" => "稀有",
-        "epic" => "史诗",
-        "legendary" => "传说",
-        "mythic" => "神话",
-        _ => Grade
-    };
+    public string GradeLabel => Localization.LangManager.GradeLabel(Grade);
     public double Rank { get; set; }
     public double AbsorbLv { get; set; }
     public double MaxImprintSlots { get; set; }
