@@ -1,6 +1,14 @@
 # SlotboundTrainer — Slotbound 纯内存修改器
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/AppleProPlusMax/slotbound-trainer)](https://github.com/AppleProPlusMax/slotbound-trainer/releases)
+[![Platform](https://img.shields.io/badge/Platform-Windows_x64-0078D6.svg)](#编译与运行)
+
 面向 **Slotbound**（LÖVE 11.5 / LuaJIT 2.1 GC64 x64）的纯外部内存修改器，采用 **.NET 6 WPF** 打造暗夜鎏金现代界面，所有功能图标均与游戏内原版图标 1:1 对应。
+
+## 界面预览
+
+![SlotboundTrainer 主界面](docs/screenshot.jpg)
 
 ## 核心特点
 - **100% 纯内存读写**：仅使用 Windows API（`OpenProcess` / `VirtualQueryEx` / `ReadProcessMemory` / `WriteProcessMemory`）直接解析并修改进程内存中的 LuaJIT 2.1 GC64 对象（`GCtab` / `Node` / `TValue`）。
@@ -28,6 +36,12 @@
 - 一键全员强化（攻击 ×2 / 生命 ×2 / 攻速 ×1.5，含词条倍率与战场实体同步）
 - 精准编辑单个单位：攻击力、生命值、攻速、吸收 LV、刻印槽
 
+## 下载使用
+
+前往 [Releases](https://github.com/AppleProPlusMax/slotbound-trainer/releases) 页面下载最新预编译版本：
+- **`SlotboundTrainer-*-win-x64-standalone.zip`**（推荐）：独立自包含单文件版，解压即用，无需安装 .NET 运行时。
+- **`SlotboundTrainer-*-win-x64-net6.zip`**：轻量版（需本机安装 .NET 6 Desktop Runtime）。
+
 ## 编译与运行
 
 环境要求：Windows 10/11 x64 + [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
@@ -40,6 +54,10 @@ dotnet build -c Release
 ```
 bin\Release\net6.0-windows\SlotboundTrainer.exe
 ```
+
+## 开源协议
+
+本项目基于 [Apache License Version 2.0](LICENSE) 开源。
 
 ## 免责声明
 本工具仅用于单机游戏学习与技术研究，所有游戏内图标资源版权归 Slotbound 原开发者所有。
